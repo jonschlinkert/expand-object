@@ -1,0 +1,55 @@
+{
+  "name": "expand-object",
+  "description": "Expand a string into a JavaScript object using a simple notation.",
+  "version": "0.1.0",
+  "homepage": "https://github.com/jonschlinkert/expand-object",
+  "author": {
+    "name": "Jon Schlinkert",
+    "url": "https://github.com/jonschlinkert"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/jonschlinkert/expand-object.git"
+  },
+  "bugs": {
+    "url": "https://github.com/jonschlinkert/expand-object/issues"
+  },
+  "license": {
+    "type": "MIT",
+    "url": "https://github.com/jonschlinkert/expand-object/blob/master/LICENSE"
+  },
+  "files": [
+    "index.js"
+  ],
+  "main": "index.js",
+  "engines": {
+    "node": ">=0.10.0"
+  },
+  "scripts": {
+    "test": "mocha"
+  },
+  "dependencies": {
+    "set-value": "^0.2.0"
+  },
+  "devDependencies": {
+    "mocha": "*",
+    "should": "*"
+  },
+  "keywords": [
+    "get",
+    "has",
+    "hasown",
+    "key",
+    "keys",
+    "nested",
+    "notation",
+    "object",
+    "prop",
+    "properties",
+    "property",
+    "props",
+    "set",
+    "value",
+    "values"
+  ]
+}
