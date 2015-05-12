@@ -37,8 +37,6 @@ npm i expand-object --save
 var expand = require('expand-object');
 ```
 
-This is a simple-object notation, if you follow the syntax in the examples, you'll be in good shape.
-
 ### dots
 
 > Expand dots into **child objects**:
