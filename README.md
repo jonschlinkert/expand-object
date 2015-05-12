@@ -146,7 +146,7 @@ expand('a.b.c:d|e.f.g:h')
 
 * [get-value](https://github.com/jonschlinkert/get-value): Use property paths (`  a.b.c`) get a nested value from an object.
 * [has-value](https://github.com/jonschlinkert/has-value): Returns true if a value exists, false if empty. Works with deeply nested values using… [more](https://github.com/jonschlinkert/has-value)
-* [stringify-object](https://github.com/yeoman/stringify-object#readme): Stringify an object/array like JSON.stringify just without all the double-quotes
+* [stringify-keys](https://github.com/doowb/stringify-keys): Build an array of key paths from an object.
 * [set-value](https://github.com/jonschlinkert/set-value): Create nested values and any intermediaries using dot notation (`'a.b.c'`) paths.
 
 ## Running tests
