@@ -1,8 +1,27 @@
 # expand-object [![NPM version](https://badge.fury.io/js/expand-object.svg)](http://badge.fury.io/js/expand-object)
 
-> Expand a string into a JavaScript object.
+> Expand a string into a JavaScript object using a simple notation.
 
 I created this to make it easier to generate objects for unit tests. I'd love to hear about other use cases!
+
+**Examples**
+
+```js
+expand('a')
+//=> {a: ''}
+
+expand('a.b')
+//=> {a: {b: ''}}
+
+expand('a|b')
+//=> {a: '', b: ''}
+
+expand('a:b')
+//=> {a: 'b'}
+
+expand('a,b')
+//=> ['a', 'b']
+```
 
 ## Install
 
