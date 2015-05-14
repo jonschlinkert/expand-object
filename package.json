@@ -28,7 +28,12 @@
   "scripts": {
     "test": "mocha"
   },
+  "bin": {
+    "expand-object": "cli.js"
+  },
   "dependencies": {
+    "commander": "^2.8.1",
+    "get-stdin": "^4.0.1",
     "set-value": "^0.2.0"
   },
   "devDependencies": {

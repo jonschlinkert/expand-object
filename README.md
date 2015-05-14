@@ -23,6 +23,28 @@ expand('a,b')
 //=> ['a', 'b']
 ```
 
+Usage with cli:
+
+```bash
+❯ expand-object --help
+
+  Usage: expand-object [options] <string>
+
+  Expand a string into a JavaScript object using a simple notation.
+
+  Options:
+
+    -h, --help     output usage information
+    -V, --version  output the version number
+    -r, --raw      Output as raw javascript object - don't stringify
+
+  Examples:
+
+    $ expand-object "a:b"
+    $ expand-object --raw "a:b"
+    $ echo "a:b" | expand-object
+```
+
 ## Install
 
 Install with [npm](https://www.npmjs.com/)
