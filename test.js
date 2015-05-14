@@ -7,7 +7,7 @@
 
 'use strict';
 
-/* deps:mocha */
+/* deps: mocha */
 var assert = require('assert');
 var should = require('should');
 var expand = require('./');
@@ -72,7 +72,7 @@ describe('expand', function () {
 });
 
 describe('escaping', function () {
-  it('should escape dots:', function () {
+  it('should escape dots preceded by slashes:', function () {
     expand('a\\.b').should.eql({'a.b': ''});
     expand('a\\.b\\.c').should.eql({'a.b.c': ''});
     expand('a\\.b\\.c\\.d').should.eql({'a.b.c.d': ''});
