@@ -1,7 +1,7 @@
 {
   "name": "expand-object",
   "description": "Expand a string into a JavaScript object using a simple notation.",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "homepage": "https://github.com/jonschlinkert/expand-object",
   "author": {
     "name": "Jon Schlinkert",
@@ -19,7 +19,8 @@
     "url": "https://github.com/jonschlinkert/expand-object/blob/master/LICENSE"
   },
   "files": [
-    "index.js"
+    "index.js",
+    "cli.js"
   ],
   "main": "index.js",
   "engines": {
