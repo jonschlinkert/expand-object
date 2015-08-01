@@ -15,7 +15,7 @@ function expand(str) {
   }
 
   if (!/[.|:]/.test(str) && /,/.test(str)) {
-    return str.split(',');
+    return toArray(str);
   }
 
   var arr = str.split('|');
@@ -60,14 +60,18 @@ function resolveValue(val) {
 }
 
 function expandArray(str) {
-  return str.split(',').map(function (ele) {
+  return toArray(str).map(function (ele) {
     return expandObject({}, ele);
   });
 }
 
+function toArray(str) {
+  return (str || '').split(',').filter(Boolean);
+}
+
 function expandObject(res, str) {
   var segs = str.split(':');
-  var parts = (segs[1] || '').split(',');
+  var parts = toArray(segs[1]);
   if (parts.length > 1) {
     setValue(res, segs[0], parts);
   } else {

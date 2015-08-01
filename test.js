@@ -57,6 +57,7 @@ describe('expand', function () {
   it('should expand comma separated values into arrays:', function () {
     eql(expand('a,b'), ['a', 'b']);
     eql(expand('a,b,c'), ['a', 'b', 'c']);
+    eql(expand('a,b,c,'), ['a', 'b', 'c']);
   });
 
   it('should expand siblings with comma separated values into arrays:', function () {
