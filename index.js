@@ -49,6 +49,10 @@ function setValue(obj, a, b) {
 }
 
 function resolveValue(val) {
+  if (typeof val === 'string' && ~val.indexOf(',')) {
+    val = toArray(val);
+  }
+
   if (Array.isArray(val)) {
     return val.map(function (ele) {
       if (~ele.indexOf('.')) {
