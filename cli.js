@@ -13,7 +13,7 @@ program
   .description(pkg.description)
   .version(pkg.version)
   .usage('[options] <string>')
-  .option('-r, --raw', "Output as raw javascript object - don't stringify")
+  .option('-r, --raw', "output as raw javascript object - don't stringify")
   .on('--help', function() {
     console.log('  Examples:');
     console.log('');
