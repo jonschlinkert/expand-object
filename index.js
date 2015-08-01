@@ -1,5 +1,6 @@
 'use strict';
 
+var isNumber = require('is-number');
 var set = require('set-value');
 
 /**
@@ -66,7 +67,9 @@ function expandArray(str) {
 }
 
 function toArray(str) {
-  return (str || '').split(',').filter(Boolean);
+  return (str || '').split(',')
+    .filter(Boolean)
+    .map(typeCast);
 }
 
 function expandObject(res, str) {
@@ -75,9 +78,32 @@ function expandObject(res, str) {
   if (parts.length > 1) {
     setValue(res, segs[0], parts);
   } else {
-    setValue(res, segs[0], segs[1]);
+    setValue(res, segs[0], typeCast(segs[1]));
   }
   return res;
+}
+
+function typeCast(val) {
+  if (val === 'true') return true;
+  if (val === 'false') return false;
+  if (isNumber(val)) {
+    return +val;
+  }
+  if (val && val.length >= 3 && isRegexString(val)) {
+    var m = /([gmi]+)$/.exec(val);
+    var flags = '';
+    if (m) {
+      flags = m[1];
+      val = val.slice(0, val.length - flags.length);
+    }
+    val = val.slice(1, val.length - 1);
+    return new RegExp(val, flags);
+  }
+  return val;
+}
+
+function isRegexString(str) {
+  return str.charAt(0) === '/' && /\/([gmi]+)?$/.test(str);
 }
 
 function isArrayLike(str) {

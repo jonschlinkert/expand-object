@@ -75,6 +75,36 @@ describe('expand', function () {
     // eql(expand('a:c.d,e:f'), { a: [ { c: { d: '' } }, {e: 'f'} ]});
   });
 
+  it('should type-cast booleans:', function () {
+    eql(expand('a:true'), {a: true});
+    eql(expand('a.b:true'), {a: {b: true}});
+    eql(expand('a.b:false'), {a: {b: false}});
+
+    eql(expand('a,true'), ['a', true]);
+    eql(expand('a,false'), ['a', false]);
+  });
+
+  it('should type-cast numbers:', function () {
+    eql(expand('a:5'), {a: 5});
+    eql(expand('a.b:5'), {a: {b: 5}});
+    eql(expand('a.b:9'), {a: {b: 9}});
+
+    eql(expand('a,5'), ['a', 5]);
+    eql(expand('a,9'), ['a', 9]);
+    eql(expand('1,2,3,4,5'), [1,2,3,4,5]);
+  });
+
+  it('should type-cast regex:', function () {
+    eql(expand('a:/foo/'), {a: /foo/});
+    eql(expand('a:/abc/'), {a: /abc/});
+    eql(expand('a.b:/abc/'), {a: {b: /abc/}});
+    eql(expand('a.b:/^foo/g'), {a: {b: /^foo/g}});
+    eql(expand('a.b:/^bar/gmi'), {a: {b: /^bar/gmi}});
+
+    eql(expand('a,/abc/'), ['a', /abc/]);
+    eql(expand('a,/^foo/g'), ['a', /^foo/g]);
+  });
+
   it('misc:', function () {
     eql(expand('a.b.c.d:x,y'), {a: { b: {c: { d: [ 'x', 'y' ] } }}});
   });
