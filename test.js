@@ -9,77 +9,91 @@
 
 /* deps: mocha */
 var assert = require('assert');
-var should = require('should');
 var expand = require('./');
+
+function eql(a, b) {
+  return assert.deepEqual(a, b);
+}
 
 describe('expand', function () {
   it('should expand dots into child objects:', function () {
-    expand('a').should.eql({a: ''});
-    expand('a.b').should.eql({a: {b: ''}});
-    expand('a.b.c').should.eql({a: {b: {c: ''}}});
-    expand('a.b.c.d').should.eql({a: {b: {c: {d: ''}}}});
+    eql(expand('a'), {a: ''});
+    eql(expand('a.b'), {a: {b: ''}});
+    eql(expand('a.b.c'), {a: {b: {c: ''}}});
+    eql(expand('a.b.c.d'), {a: {b: {c: {d: ''}}}});
   });
 
   it('should expand pipes into sibling objects:', function () {
-    expand('a|b').should.eql({a: '', b: ''});
-    expand('a|b|c').should.eql({a: '', b: '', c: ''});
-    expand('a|b|c|d').should.eql({a: '', b: '', c: '', d: ''});
+    eql(expand('a|b'), {a: '', b: ''});
+    eql(expand('a|b|c'), {a: '', b: '', c: ''});
+    eql(expand('a|b|c|d'), {a: '', b: '', c: '', d: ''});
   });
 
   it('should expand colons into key-value pairs:', function () {
-    expand('a:b').should.eql({a: 'b'});
-    expand('a.b:c').should.eql({a: {b: 'c'}});
-    expand('a.b.c:d').should.eql({a: {b: {c: 'd'}}});
+    eql(expand('a:b'), {a: 'b'});
+    eql(expand('a.b:c'), {a: {b: 'c'}});
+    eql(expand('a.b.c:d'), {a: {b: {c: 'd'}}});
   });
 
   it('should expand sibling objects into key-value pairs:', function () {
-    expand('a:b|c:d').should.eql({a: 'b', c: 'd'});
-    expand('a:b|c:d|e:f').should.eql({a: 'b', c: 'd', e: 'f'});
-    expand('a:b|c:d|e:f|g:h').should.eql({a: 'b', c: 'd', e: 'f', g: 'h'});
+    eql(expand('a:b|c:d'), {a: 'b', c: 'd'});
+    eql(expand('a:b|c:d|e:f'), {a: 'b', c: 'd', e: 'f'});
+    eql(expand('a:b|c:d|e:f|g:h'), {a: 'b', c: 'd', e: 'f', g: 'h'});
   });
 
   it('should expand child objects into key-value pairs:', function () {
-    expand('a.b:c').should.eql({a: {b: 'c'}});
-    expand('a.b.c:d').should.eql({a: {b: {c: 'd'}}});
-    expand('a.b.c.d:e').should.eql({a: {b: {c: {d: 'e'}}}});
+    eql(expand('a.b:c'), {a: {b: 'c'}});
+    eql(expand('a.b.c:d'), {a: {b: {c: 'd'}}});
+    eql(expand('a.b.c.d:e'), {a: {b: {c: {d: 'e'}}}});
   });
 
   it('should expand sibling and child objects into key-value pairs:', function () {
-    expand('a:b|c:d').should.eql({a: 'b', c: 'd'});
-    expand('a.b.c|d.e:f').should.eql({a: {b: {c: ''}}, d: {e: 'f'}});
-    expand('a.b:c|d.e:f').should.eql({a: {b: 'c'}, d: {e: 'f'}});
-    expand('a.b.c:d|e.f.g:h').should.eql({a: {b: {c: 'd'}}, e: {f: {g: 'h'}}});
+    eql(expand('a:b|c:d'), {a: 'b', c: 'd'});
+    eql(expand('a.b.c|d.e:f'), {a: {b: {c: ''}}, d: {e: 'f'}});
+    eql(expand('a.b:c|d.e:f'), {a: {b: 'c'}, d: {e: 'f'}});
+    eql(expand('a.b.c:d|e.f.g:h'), {a: {b: {c: 'd'}}, e: {f: {g: 'h'}}});
   });
 
   it('should expand comma separated values into arrays:', function () {
-    expand('a,b').should.eql(['a', 'b']);
-    expand('a,b,c').should.eql(['a', 'b', 'c']);
+    eql(expand('a,b'), ['a', 'b']);
+    eql(expand('a,b,c'), ['a', 'b', 'c']);
   });
 
   it('should expand siblings with comma separated values into arrays:', function () {
-    expand('a:b,c,d|e:f,g,h').should.eql({a: ['b', 'c', 'd'], e: ['f', 'g', 'h']});
+    eql(expand('a:b,c,d|e:f,g,h'), {a: ['b', 'c', 'd'], e: ['f', 'g', 'h']});
   });
 
   it('should expand children with comma separated values into arrays:', function () {
-    expand('a.b.c:d,e,f|g.h:i,j,k').should.eql({ a: {  b: { c: [ 'd', 'e', 'f' ] } }, g: { h: [ 'i', 'j', 'k' ] } });
+    eql(expand('a.b.c:d,e,f|g.h:i,j,k'), { a: {  b: { c: [ 'd', 'e', 'f' ] } }, g: { h: [ 'i', 'j', 'k' ] } });
+  });
+
+  it('should expand an array of objects:', function () {
+    eql(expand('a:b,c:d,e:f'), [{a: 'b'}, {c: 'd'}, {e: 'f'}]);
+    eql(expand('a.b:c.d,e.f:g,h:i'), {a: {b: [{c: {d: '' }}, {e: {f: '' } }] }});
+    eql(expand('a:c.d,e'), { a: [ { c: { d: '' } }, 'e' ]});
+    // eql(expand('a:c.d,e:f'), { a: [ { c: { d: '' } }, {e: 'f'} ]});
+  });
+
+  it('misc:', function () {
+    eql(expand('a.b.c.d:x,y'), {a: { b: {c: { d: [ 'x', 'y' ] } }}});
   });
 
   it('should throw an error:', function () {
-    (function () {
+    assert.throws(function () {
       expand();
-    }).should.throw('expand-object expects a string.');
+    }, 'expand-object expects a string.');
   });
 });
 
 describe('escaping', function () {
   it('should escape dots preceded by slashes:', function () {
-    expand('a\\.b').should.eql({'a.b': ''});
-    expand('a\\.b\\.c').should.eql({'a.b.c': ''});
-    expand('a\\.b\\.c\\.d').should.eql({'a.b.c.d': ''});
+    eql(expand('a\\.b'), {'a.b': ''});
+    eql(expand('a\\.b\\.c'), {'a.b.c': ''});
+    eql(expand('a\\.b\\.c\\.d'), {'a.b.c.d': ''});
 
-    expand('a\\.b.c').should.eql({'a.b': {c: ''}});
-    expand('a\\.b.c.d').should.eql({'a.b': {c: {d: ''}}});
-    expand('a\\.b.c.d\\.e').should.eql({'a.b': {c: {'d.e': ''}}});
-    expand('a\\.b.c\\.d').should.eql({'a.b': {'c.d': ''}});
+    eql(expand('a\\.b.c'), {'a.b': {c: ''}});
+    eql(expand('a\\.b.c.d'), {'a.b': {c: {d: ''}}});
+    eql(expand('a\\.b.c.d\\.e'), {'a.b': {c: {'d.e': ''}}});
+    eql(expand('a\\.b.c\\.d'), {'a.b': {'c.d': ''}});
   });
 });
