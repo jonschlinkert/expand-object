@@ -24,12 +24,32 @@ function expand(str) {
   var res = {};
 
   if (isArrayLike(str) && arr.length === 1) {
-    return expandArray(str);
+    var m = /\w+:.*:/.exec(str);
+    if (!m) return expandArray(str);
+
+    var i = str.indexOf(':');
+    var key = str.slice(0, i);
+    var val = str.slice(i + 1);
+
+    if (/\w+,\w+,/.test(val)) {
+      var obj = {};
+      obj[key] = toArray(val).map(function (ele) {
+        if (~ele.indexOf(':')) {
+          return expandObject({}, ele);
+        }
+        return ele;
+      });
+      return obj;
+    }
+
+    return toArray(str).map(function (ele) {
+      return expandObject({}, ele);
+    });
   }
 
   while (++i < len) {
     var val = arr[i];
-    if (!/[.,|:]/.test(val)) {
+    if (!/[.,\|:]/.test(val)) {
       res[val] = '';
     } else {
       expandObject(res, val);
@@ -65,9 +85,16 @@ function resolveValue(val) {
 }
 
 function expandArray(str) {
-  return toArray(str).map(function (ele) {
-    return expandObject({}, ele);
+  var segs = str.split(':');
+  var key = segs.shift();
+  var res = {}, val = [];
+
+  segs.forEach(function (seg) {
+    val = val.concat(resolveValue(toArray(seg)));
   });
+
+  res[key] = val;
+  return res;
 }
 
 function toArray(str) {
@@ -111,7 +138,7 @@ function isRegexString(str) {
 }
 
 function isArrayLike(str) {
-  return /^(?:\w+[,:]\w+[,:])+/.test(str);
+  return /^(?:(\w+:\w+[,:])+)+/.exec(str);
 }
 
 /**
