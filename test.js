@@ -37,6 +37,7 @@ describe('expand', function () {
 
   it('should expand sibling objects into key-value pairs:', function () {
     eql(expand('a:b|c:d'), {a: 'b', c: 'd'});
+    eql(expand('a:b|c:d'), {a: 'b', c: 'd'});
     eql(expand('a:b|c:d|e:f'), {a: 'b', c: 'd', e: 'f'});
     eql(expand('a:b|c:d|e:f|g:h'), {a: 'b', c: 'd', e: 'f', g: 'h'});
   });
@@ -80,6 +81,14 @@ describe('expand', function () {
     eql(expand('a:b,c'), {a: ['b', 'c']});
     eql(expand('a:b,c,d'), {a: ['b', 'c', 'd']});
     eql(expand('a:b,c,d|e:f,g,i'), {a: ['b', 'c', 'd'], e: ['f', 'g', 'i']});
+  });
+
+  it('should expand objects with sibling:', function () {
+    eql(expand('a:b+c:d'), {a: 'b', c: 'd'});
+    eql(expand('a:b+c:d+e:f'), {a: 'b', c: 'd', e: 'f'});
+    eql(expand('a.b:c+d:e+f:g'), {a: {b: 'c', d: 'e', f: 'g'}});
+    eql(expand('a.b:c|d:e|f:g'), {a: {b: 'c'}, d: 'e', f: 'g'});
+    eql(expand('a.b.c:d+e:f+g:h'), {a: {b: {c: 'd', e: 'f', g: 'h'}}});
   });
 
   it('should type-cast booleans:', function () {

@@ -24,27 +24,7 @@ function expand(str) {
   var res = {};
 
   if (isArrayLike(str) && arr.length === 1) {
-    var m = /\w+:.*:/.exec(str);
-    if (!m) return expandArray(str);
-
-    var i = str.indexOf(':');
-    var key = str.slice(0, i);
-    var val = str.slice(i + 1);
-
-    if (/\w+,\w+,/.test(val)) {
-      var obj = {};
-      obj[key] = toArray(val).map(function (ele) {
-        if (~ele.indexOf(':')) {
-          return expandObject({}, ele);
-        }
-        return ele;
-      });
-      return obj;
-    }
-
-    return toArray(str).map(function (ele) {
-      return expandObject({}, ele);
-    });
+    return expandArrayObj(str);
   }
 
   while (++i < len) {
@@ -52,7 +32,7 @@ function expand(str) {
     if (!/[.,\|:]/.test(val)) {
       res[val] = '';
     } else {
-      expandObject(res, val);
+      res = expandObject(res, val);
     }
   }
   return res;
@@ -72,7 +52,6 @@ function resolveValue(val) {
   if (typeof val === 'string' && ~val.indexOf(',')) {
     val = toArray(val);
   }
-
   if (Array.isArray(val)) {
     return val.map(function (ele) {
       if (~ele.indexOf('.')) {
@@ -103,8 +82,29 @@ function toArray(str) {
     .map(typeCast);
 }
 
+function expandSiblings(segs) {
+  var first = segs.shift();
+  var parts = first.split('.');
+  var arr = [parts.pop()].concat(segs);
+  var key = parts.join('.');
+  var siblings = {};
+
+  var val = arr.reduce(function (acc, val) {
+    expandObject(acc, val);
+    return acc;
+  }, {});
+
+  if (!key) return val;
+  set(siblings, key, val);
+  return siblings;
+}
+
 function expandObject(res, str) {
-  var segs = str.split(':');
+  var segs = str.split('+');
+  if (segs.length > 1) {
+    return expandSiblings(segs);
+  }
+  segs = str.split(':');
   var parts = toArray(segs[1]);
   if (parts.length > 1) {
     setValue(res, segs[0], parts);
@@ -112,6 +112,29 @@ function expandObject(res, str) {
     setValue(res, segs[0], typeCast(segs[1]));
   }
   return res;
+}
+
+function expandArrayObj(str) {
+  var m = /\w+:.*:/.exec(str);
+  if (!m) return expandArray(str);
+
+  var i = str.indexOf(':');
+  var key = str.slice(0, i);
+  var val = str.slice(i + 1);
+
+  if (/\w+,\w+,/.test(val)) {
+    var obj = {};
+    obj[key] = toArray(val).map(function (ele) {
+      return ~ele.indexOf(':')
+        ? expandObject({}, ele)
+        : ele;
+    });
+    return obj;
+  }
+
+  return toArray(str).map(function (ele) {
+    return expandObject({}, ele);
+  });
 }
 
 function typeCast(val) {
