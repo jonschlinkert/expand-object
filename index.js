@@ -19,7 +19,7 @@ function expand(str) {
     return toArray(str);
   }
 
-  var arr = str.split('|');
+  var arr = String(str).split('|');
   var len = arr.length, i = -1;
   var res = {};
 
@@ -40,7 +40,7 @@ function expand(str) {
 
 function setValue(obj, a, b) {
   var val = resolveValue(b || '');
-  if (~a.indexOf('.')) {
+  if (~String(a).indexOf('.')) {
     return set(obj, a, val);
   } else {
     obj[a] = val;
@@ -54,7 +54,7 @@ function resolveValue(val) {
   }
   if (Array.isArray(val)) {
     return val.map(function (ele) {
-      if (~ele.indexOf('.')) {
+      if (~String(ele).indexOf('.')) {
         return setValue({}, ele, '');
       }
       return ele;
@@ -64,7 +64,7 @@ function resolveValue(val) {
 }
 
 function expandArray(str) {
-  var segs = str.split(':');
+  var segs = String(str).split(':');
   var key = segs.shift();
   var res = {}, val = [];
 
@@ -100,7 +100,7 @@ function expandSiblings(segs) {
 }
 
 function expandObject(res, str) {
-  var segs = str.split('+');
+  var segs = String(str).split('+');
   if (segs.length > 1) {
     return expandSiblings(segs);
   }
