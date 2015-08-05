@@ -19,7 +19,7 @@ function expand(str) {
     return toArray(str);
   }
 
-  var arr = String(str).split('|');
+  var arr = splitString(str, '|');
   var len = arr.length, i = -1;
   var res = {};
 
@@ -100,7 +100,7 @@ function expandSiblings(segs) {
 }
 
 function expandObject(res, str) {
-  var segs = String(str).split('+');
+  var segs = splitString(str, '+');
   if (segs.length > 1) {
     return expandSiblings(segs);
   }
@@ -164,6 +164,40 @@ function isArrayLike(str) {
   return /^(?:(\w+:\w+[,:])+)+/.exec(str);
 }
 
+function splitString(str, ch) {
+  str = String(str);
+  var len = str.length, i = -1;
+  var inside = 0;
+  var res = [];
+  var seg = '';
+
+  while (++i < len) {
+    var curr = str[i];
+    if (curr === '/') {
+      seg += curr;
+      while ((curr = str[++i]) !== '/') {
+        seg += curr;
+      }
+    }
+
+    if (curr !== ch) {
+      if (curr === '\\' && str[i + 1] === ch) {
+        curr = ch;
+      }
+
+      seg += curr;
+    } else if (str[i - 1] !== '\\') {
+      res.push(seg);
+      seg = '';
+    }
+
+    if (i === len - 1 && seg && (str[i - 1] !== '\\')) {
+      res.push(seg);
+      seg = '';
+    }
+  }
+  return res;
+}
 /**
  * Expose `expand`
  */

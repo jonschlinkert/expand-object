@@ -135,7 +135,20 @@ describe('expand', function () {
 });
 
 describe('escaping', function () {
-  it('should escape dots preceded by slashes:', function () {
+  it('should support escaped pipes:', function () {
+    eql(expand('a\\|b'), {'a|b': ''});
+    eql(expand('a\\|b|c|d'), {'a|b': '', c: '', d: ''});
+  });
+
+  it('should not split inside a regex string:', function () {
+    eql(expand('a\\|b'), {'a|b': ''});
+    eql(expand('a:b+c:d'), {a: 'b', c: 'd'});
+    eql(expand('a:/b+c/d'), {a: '/b+c/d'});
+    eql(expand('a:/b|c+/d'), {a: '/b|c+/d'});
+    eql(expand('a\\|b|/c|d/'), {'a|b': '', '/c|d/': ''});
+  });
+
+  it('should support escape dots:', function () {
     eql(expand('a\\.b'), {'a.b': ''});
     eql(expand('a\\.b\\.c'), {'a.b.c': ''});
     eql(expand('a\\.b\\.c\\.d'), {'a.b.c.d': ''});
