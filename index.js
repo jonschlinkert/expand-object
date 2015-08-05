@@ -191,7 +191,6 @@ function toObject(val) {
 function splitString(str, ch) {
   str = String(str);
   var len = str.length, i = -1;
-  var inside = 0;
   var res = [];
   var seg = '';
 
