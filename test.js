@@ -73,7 +73,6 @@ describe('expand', function () {
     eql(expand('foo:bar,baz,a:b'), {foo: ['bar', 'baz', {a: 'b'}]});
     eql(expand('a:b,c:d,e:f'), [{a: 'b'}, {c: 'd'}, {e: 'f'}]);
     eql(expand('a.b:c.d,e.f:g,h:i'), {a: {b: [{c: {d: '' }}, {e: {f: '' } }] }});
-    eql(expand('a:c.d,e'), { a: [ { c: { d: '' } }, 'e' ]});
     // maybe that last one should be more like this?:
     // eql(expand('a:c.d,e:f'), { a: {c: ['d', {e: 'f'}] }});
   });
@@ -81,6 +80,7 @@ describe('expand', function () {
   it('should expand objects with array values:', function () {
     eql(expand('a:b,'), {a: ['b']});
     eql(expand('a:b,c'), {a: ['b', 'c']});
+    eql(expand('a:c.d,e'), { a: [ { c: { d: '' } }, 'e' ]});
     eql(expand('a:b,c,d'), {a: ['b', 'c', 'd']});
     eql(expand('a:b,c,d|e:f,g,i'), {a: ['b', 'c', 'd'], e: ['f', 'g', 'i']});
   });

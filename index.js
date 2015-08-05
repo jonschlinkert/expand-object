@@ -29,7 +29,15 @@ function expand(str) {
 
   while (++i < len) {
     var val = arr[i];
-    if (!/[.,\|:]/.test(val)) {
+    var re = /^((?:\w+)\.(?:\w+))[:.]((?:\w+,)+)+((?:\w+):(?:\w+))/;
+    var m = re.exec(val);
+    if (m && m[1] && m[2] && m[3]) {
+      var arrVal = m[2];
+      arrVal = arrVal.replace(/,$/, '');
+      var prop = arrVal.split(',');
+      prop = prop.concat(toObject(m[3]));
+      res = set(res, m[1], prop);
+    } else if (!/[.,\|:]/.test(val)) {
       res[val] = '';
     } else {
       res = expandObject(res, val);
@@ -39,7 +47,7 @@ function expand(str) {
 }
 
 function setValue(obj, a, b) {
-  var val = resolveValue(b || '');
+  var val = resolveValue(b);
   if (~String(a).indexOf('.')) {
     return set(obj, a, val);
   } else {
@@ -49,9 +57,11 @@ function setValue(obj, a, b) {
 }
 
 function resolveValue(val) {
+  if (typeof val === 'undefined') return '';
   if (typeof val === 'string' && ~val.indexOf(',')) {
     val = toArray(val);
   }
+
   if (Array.isArray(val)) {
     return val.map(function (ele) {
       if (~String(ele).indexOf('.')) {
@@ -77,9 +87,12 @@ function expandArray(str) {
 }
 
 function toArray(str) {
-  return (str || '').split(',')
-    .filter(Boolean)
-    .map(typeCast);
+  return (str || '').split(',').reduce(function (acc, val) {
+    if (typeof val !== 'undefined' && val !== '') {
+      acc.push(typeCast(val));
+    }
+    return acc;
+  }, []);
 }
 
 function expandSiblings(segs) {
@@ -138,8 +151,12 @@ function expandArrayObj(str) {
 }
 
 function typeCast(val) {
-  if (val === 'true') return true;
-  if (val === 'false') return false;
+  if (val === 'true') {
+    return true;
+  }
+  if (val === 'false') {
+    return false;
+  }
   if (isNumber(val)) {
     return +val;
   }
@@ -162,6 +179,13 @@ function isRegexString(str) {
 
 function isArrayLike(str) {
   return /^(?:(\w+:\w+[,:])+)+/.exec(str);
+}
+
+function toObject(val) {
+  var obj = {};
+  var segs = String(val).split(':');
+  obj[segs[0]] = typeCast(segs[1]);
+  return obj;
 }
 
 function splitString(str, ch) {
