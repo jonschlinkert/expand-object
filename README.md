@@ -100,7 +100,7 @@ To use as a node.js library:
 var expand = require('expand-object');
 ```
 
-### dots
+### children
 
 > Expand dots into **child objects**:
 
@@ -115,9 +115,13 @@ expand('a.b.c.d')
 //=> {a: {b: {c: {d: ''}}}}
 ```
 
-### pipes
+### siblings
 
-> Expand pipes into **sibling objects**:
+expand-object supports two kinds of siblings, **general** and **adjacent**. It's much easier to understand the difference in the last example.
+
+#### general siblings
+
+> Use pipes (`|`) to expand **general siblings**:
 
 ```js
 expand('a|b')
@@ -126,9 +130,41 @@ expand('a|b|c')
 //=> {a: '', b: '', c: ''}
 expand('a|b|c|d')
 //=> {a: '', b: '', c: '', d: ''}
+expand('a:b|c:d')
+//=> {a: 'b', c: 'd'}
 ```
 
-### colons
+#### adjacent siblings
+
+> Use plus (`+`) to expand **adjacent siblings**:
+
+Adjacent siblings are objects that immediately follow one another.
+
+```js
+expand('a:b+c:d')
+//=> {a: 'b', c: 'd'}
+expand('a.b:c+d:e')
+//=> {a: {b: 'c', d: 'e'}}
+```
+
+#### difference between sibling types
+
+In the example below:
+
+* **general**: `d` is a sibling to `a`
+* **adjacent**: `d` is a sibling to `b`
+
+```js
+// general siblings
+expand('a.b:c|d:e')
+//=> { a: { b: 'c' }, d: 'e' }
+
+// adjacent siblings
+expand('a.b:c+d:e')
+//=> { a: { b: 'c', d: 'e' } }
+```
+
+### key-value pairs
 
 > Expand colons into **key-value pairs**:
 
@@ -141,7 +177,7 @@ expand('a.b.c:d')
 //=> {a: {b: {c: 'd'}}}
 ```
 
-### commas
+### arrays
 
 > Expand comma separated values into **arrays**:
 
