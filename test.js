@@ -52,6 +52,8 @@ describe('expand', function () {
     eql(expand('a.b:c'), {a: {b: 'c'}});
     eql(expand('a.b.c:d'), {a: {b: {c: 'd'}}});
     eql(expand('a.b.c.d:e'), {a: {b: {c: {d: 'e'}}}});
+    eql(expand('a:b.c.d:e'), {a: {b: {c: {d: 'e'}}}});
+    eql(expand('a:b.c.d.e.f:g'), {a: {b: {c: {d: {e: {f: 'g'}}}}}});
   });
 
   it('should expand sibling and child objects into key-value pairs:', function () {
@@ -59,6 +61,11 @@ describe('expand', function () {
     eql(expand('a.b.c|d.e:f'), {a: {b: {c: ''}}, d: {e: 'f'}});
     eql(expand('a.b:c|d.e:f'), {a: {b: 'c'}, d: {e: 'f'}});
     eql(expand('a.b.c:d|e.f.g:h'), {a: {b: {c: 'd'}}, e: {f: {g: 'h'}}});
+  });
+
+  it('should expand flags:', function () {
+    eql(expand('a=b|c:d'), {a: 'b', c: 'd'});
+    eql(expand('a.b.c=d'), {a: {b: {c: 'd'}}});
   });
 
   it('should expand comma separated values into arrays:', function () {

@@ -10,15 +10,21 @@ var set = require('set-value');
  * @return {Object}
  */
 
-function expand(str, options) {
-  options = options || {};
+function expand(str, opts) {
+  opts = opts || {};
 
   if (typeof str !== 'string') {
     throw new TypeError('expand-object expects a string.');
   }
 
-  if (!/[.|:]/.test(str) && /,/.test(str)) {
+  if (!/[.|:=]/.test(str) && /,/.test(str)) {
     return toArray(str);
+  }
+
+  var m;
+  if ((m = /(\w+[:=]\w+\.)+/.exec(str)) && !/[|,+]/.test(str)) {
+    var val = m[0].split(':').join('.');
+    str = val + str.slice(m[0].length);
   }
 
   var arr = splitString(str, '|');
@@ -26,7 +32,7 @@ function expand(str, options) {
   var res = {};
 
   if (isArrayLike(str) && arr.length === 1) {
-    return expandArrayObj(str);
+    return expandArrayObj(str, opts);
   }
 
   while (++i < len) {
@@ -39,27 +45,30 @@ function expand(str, options) {
       var prop = arrVal.split(',');
       prop = prop.concat(toObject(m[3]));
       res = set(res, m[1], prop);
-    } else if (!/[.,\|:]/.test(val)) {
-      res[val] = options.toBoolean ? true : '';
+    } else if (!/[.,\|:=]/.test(val)) {
+      res[val] = opts.toBoolean ? true : '';
     } else {
-      res = expandObject(res, val);
+      res = expandObject(res, val, opts);
     }
   }
   return res;
 }
 
-function setValue(obj, a, b) {
-  var val = resolveValue(b);
+function setValue(obj, a, b, opts) {
+  var val = resolveValue(b, opts);
   if (~String(a).indexOf('.')) {
-    return set(obj, a, val);
+    return set(obj, a, typeCast(val));
   } else {
-    obj[a] = val;
+    obj[a] = typeCast(val);
   }
   return obj;
 }
 
-function resolveValue(val) {
-  if (typeof val === 'undefined') return '';
+function resolveValue(val, opts) {
+  opts = opts || {};
+  if (typeof val === 'undefined') {
+    return opts.toBoolean ? true : '';
+  }
   if (typeof val === 'string' && ~val.indexOf(',')) {
     val = toArray(val);
   }
@@ -67,7 +76,7 @@ function resolveValue(val) {
   if (Array.isArray(val)) {
     return val.map(function (ele) {
       if (~String(ele).indexOf('.')) {
-        return setValue({}, ele, '');
+        return setValue({}, ele, opts.toBoolean ? true : '');
       }
       return ele;
     });
@@ -75,13 +84,13 @@ function resolveValue(val) {
   return val;
 }
 
-function expandArray(str) {
-  var segs = String(str).split(':');
+function expandArray(str, opts) {
+  var segs = String(str).split(/[:=]/);
   var key = segs.shift();
   var res = {}, val = [];
 
   segs.forEach(function (seg) {
-    val = val.concat(resolveValue(toArray(seg)));
+    val = val.concat(resolveValue(toArray(seg), opts));
   });
 
   res[key] = val;
@@ -97,7 +106,7 @@ function toArray(str) {
   }, []);
 }
 
-function expandSiblings(segs) {
+function expandSiblings(segs, opts) {
   var first = segs.shift();
   var parts = first.split('.');
   var arr = [parts.pop()].concat(segs);
@@ -105,7 +114,7 @@ function expandSiblings(segs) {
   var siblings = {};
 
   var val = arr.reduce(function (acc, val) {
-    expandObject(acc, val);
+    expandObject(acc, val, opts);
     return acc;
   }, {});
 
@@ -114,24 +123,20 @@ function expandSiblings(segs) {
   return siblings;
 }
 
-function expandObject(res, str) {
+function expandObject(res, str, opts) {
   var segs = splitString(str, '+');
   if (segs.length > 1) {
-    return expandSiblings(segs);
+    return expandSiblings(segs, opts);
   }
-  segs = str.split(':');
-  var parts = toArray(segs[1]);
-  if (parts.length > 1) {
-    setValue(res, segs[0], parts);
-  } else {
-    setValue(res, segs[0], typeCast(segs[1]));
-  }
+
+  segs = str.split(/[:=]/);
+  setValue(res, segs[0], segs[1]);
   return res;
 }
 
-function expandArrayObj(str) {
+function expandArrayObj(str, opts) {
   var m = /\w+:.*:/.exec(str);
-  if (!m) return expandArray(str);
+  if (!m) return expandArray(str, opts);
 
   var i = str.indexOf(':');
   var key = str.slice(0, i);
@@ -141,14 +146,14 @@ function expandArrayObj(str) {
     var obj = {};
     obj[key] = toArray(val).map(function (ele) {
       return ~ele.indexOf(':')
-        ? expandObject({}, ele)
+        ? expandObject({}, ele, opts)
         : ele;
     });
     return obj;
   }
 
   return toArray(str).map(function (ele) {
-    return expandObject({}, ele);
+    return expandObject({}, ele, opts);
   });
 }
 
@@ -176,16 +181,18 @@ function typeCast(val) {
 }
 
 function isRegexString(str) {
-  return str.charAt(0) === '/' && /\/([gmi]+)?$/.test(str);
+  return typeof str === 'string'
+    && /\/([gmi]+)?$/.test(str)
+    && str.charAt(0) === '/';
 }
 
 function isArrayLike(str) {
-  return /^(?:(\w+:\w+[,:])+)+/.exec(str);
+  return typeof str === 'string' && /^(?:(\w+[:=]\w+[,:])+)+/.exec(str);
 }
 
 function toObject(val) {
   var obj = {};
-  var segs = String(val).split(':');
+  var segs = String(val).split(/[:=]/);
   obj[segs[0]] = typeCast(segs[1]);
   return obj;
 }
