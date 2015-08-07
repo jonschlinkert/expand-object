@@ -29,6 +29,12 @@ describe('expand', function () {
     eql(expand('a|b|c|d'), {a: '', b: '', c: '', d: ''});
   });
 
+  it('should set undefined values as `true` when `toBoolean` is defined:', function () {
+    eql(expand('a|b', {toBoolean: true}), {a: true, b: true});
+    eql(expand('a|b|c', {toBoolean: true}), {a: true, b: true, c: true});
+    eql(expand('a|b|c|d', {toBoolean: true}), {a: true, b: true, c: true, d: true});
+  });
+
   it('should expand colons into key-value pairs:', function () {
     eql(expand('a:b'), {a: 'b'});
     eql(expand('a.b:c'), {a: {b: 'c'}});

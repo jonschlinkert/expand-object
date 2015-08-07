@@ -10,7 +10,9 @@ var set = require('set-value');
  * @return {Object}
  */
 
-function expand(str) {
+function expand(str, options) {
+  options = options || {};
+
   if (typeof str !== 'string') {
     throw new TypeError('expand-object expects a string.');
   }
@@ -38,7 +40,7 @@ function expand(str) {
       prop = prop.concat(toObject(m[3]));
       res = set(res, m[1], prop);
     } else if (!/[.,\|:]/.test(val)) {
-      res[val] = '';
+      res[val] = options.toBoolean ? true : '';
     } else {
       res = expandObject(res, val);
     }
