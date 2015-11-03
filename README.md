@@ -246,6 +246,8 @@ expand('a.b.c:d|e.f.g:h')
 
 ## Related projects
 
+[expand-args](https://www.npmjs.com/package/expand-args): Expand parsed command line arguments using expand-object. | [homepage](https://github.com/jonschlinkert/expand-args)
+
 ## Running tests
 
 Install dev dependencies:
