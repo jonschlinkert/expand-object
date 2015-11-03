@@ -125,17 +125,6 @@ describe('expand', function () {
     eql(expand('1,2,3,4,5'), [1,2,3,4,5]);
   });
 
-  it('should type-cast regex:', function () {
-    eql(expand('a:/foo/'), {a: /foo/});
-    eql(expand('a:/abc/'), {a: /abc/});
-    eql(expand('a.b:/abc/'), {a: {b: /abc/}});
-    eql(expand('a.b:/^foo/g'), {a: {b: /^foo/g}});
-    eql(expand('a.b:/^bar/gmi'), {a: {b: /^bar/gmi}});
-
-    eql(expand('a,/abc/'), ['a', /abc/]);
-    eql(expand('a,/^foo/g'), ['a', /^foo/g]);
-  });
-
   it('misc:', function () {
     eql(expand('a.b.c.d:x,y'), {a: { b: {c: { d: [ 'x', 'y' ] } }}});
   });
@@ -159,6 +148,12 @@ describe('escaping', function () {
     eql(expand('a:/b+c/d'), {a: '/b+c/d'});
     eql(expand('a:/b|c+/d'), {a: '/b|c+/d'});
     eql(expand('a\\|b|/c|d/'), {'a|b': '', '/c|d/': ''});
+  });
+
+  it('should not choke on file paths:', function () {
+    eql(expand('/a/b/c'), {'/a/b/c': ''});
+    eql(expand('/abc'), {'/abc': ''});
+    eql(expand('/abc,'), ['/abc']);
   });
 
   it('should support escape dots:', function () {

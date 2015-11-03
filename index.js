@@ -167,23 +167,7 @@ function typeCast(val) {
   if (isNumber(val)) {
     return +val;
   }
-  if (val && val.length >= 3 && isRegexString(val)) {
-    var m = /([gmi]+)$/.exec(val);
-    var flags = '';
-    if (m) {
-      flags = m[1];
-      val = val.slice(0, val.length - flags.length);
-    }
-    val = val.slice(1, val.length - 1);
-    return new RegExp(val, flags);
-  }
   return val;
-}
-
-function isRegexString(str) {
-  return typeof str === 'string'
-    && /\/([gmi]+)?$/.test(str)
-    && str.charAt(0) === '/';
 }
 
 function isArrayLike(str) {
@@ -207,7 +191,12 @@ function splitString(str, ch) {
     var curr = str[i];
     if (curr === '/') {
       seg += curr;
+
       while ((curr = str[++i]) !== '/') {
+        if (i >= len) {
+          res.push(seg);
+          break;
+        }
         seg += curr;
       }
     }
@@ -216,7 +205,6 @@ function splitString(str, ch) {
       if (curr === '\\' && str[i + 1] === ch) {
         curr = ch;
       }
-
       seg += curr;
     } else if (str[i - 1] !== '\\') {
       res.push(seg);
@@ -230,6 +218,7 @@ function splitString(str, ch) {
   }
   return res;
 }
+
 /**
  * Expose `expand`
  */
