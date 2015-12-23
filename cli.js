@@ -6,9 +6,6 @@ process.title = 'expand-object';
 
 var argv = require('minimist')(process.argv.slice(2));
 var stdin = require('get-stdin');
-var Store = require('data-store');
-var store = new Store('expand-object');
-
 var expand = require('./index');
 var pkg = require('./package.json');
 
@@ -35,21 +32,9 @@ if (argv._.length === 0 && Object.keys(argv).length === 1 || argv.help) {
 }
 
 function run(contents) {
-  if (argv.get) {
-    output = store.get(argv.get);
-    console.log(output);
-    return;
-  }
-
-  var output = contents;
-  if (argv.set) {
-    output = expand(argv.set);
-    store.set(output);
-  } else {
-    output = expand(contents);
-    if (!argv.raw) {
-      output = JSON.stringify(output);
-    }
+  var output = expand(contents);
+  if (!argv.raw) {
+    output = JSON.stringify(output);
   }
 
   console.log(output);
@@ -57,9 +42,9 @@ function run(contents) {
 }
 
 if (!process.stdin.isTTY) {
-  return stdin(function(contents) {
+  stdin(function(contents) {
     run(contents);
   });
+} else {
+  run(argv._[0] || '');
 }
-
-run(argv._[0] || '');
