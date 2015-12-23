@@ -37,6 +37,12 @@ function expand(str, opts) {
 
   while (++i < len) {
     var val = arr[i];
+    // test for `https://foo`
+    if (/\w:\/\/\w/.test(val)) {
+      res[val] = '';
+      continue;
+    }
+
     var re = /^((?:\w+)\.(?:\w+))[:.]((?:\w+,)+)+((?:\w+):(?:\w+))/;
     var m = re.exec(val);
     if (m && m[1] && m[2] && m[3]) {
@@ -135,7 +141,7 @@ function expandObject(res, str, opts) {
 }
 
 function expandArrayObj(str, opts) {
-  var m = /\w+:.*:/.exec(str);
+  var m = /\w+:.*?:/.exec(str);
   if (!m) return expandArray(str, opts);
 
   var i = str.indexOf(':');
@@ -183,38 +189,18 @@ function toObject(val) {
 
 function splitString(str, ch) {
   str = String(str);
-  var len = str.length, i = -1;
+
+  var segs = str.split(ch);
+  var len = segs.length;
   var res = [];
-  var seg = '';
+  var i = -1;
 
   while (++i < len) {
-    var curr = str[i];
-    if (curr === '/') {
-      seg += curr;
-
-      while ((curr = str[++i]) !== '/') {
-        if (i >= len) {
-          res.push(seg);
-          break;
-        }
-        seg += curr;
-      }
+    var key = segs[i];
+    while (key[key.length - 1] === '\\') {
+      key = key.slice(0, -1) + ch + segs[++i];
     }
-
-    if (curr !== ch) {
-      if (curr === '\\' && str[i + 1] === ch) {
-        curr = ch;
-      }
-      seg += curr;
-    } else if (str[i - 1] !== '\\') {
-      res.push(seg);
-      seg = '';
-    }
-
-    if (i === len - 1 && seg && (str[i - 1] !== '\\')) {
-      res.push(seg);
-      seg = '';
-    }
+    res.push(key);
   }
   return res;
 }
