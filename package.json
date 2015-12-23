@@ -5,11 +5,13 @@
   "homepage": "https://github.com/jonschlinkert/expand-object",
   "author": "Jon Schlinkert (https://github.com/jonschlinkert)",
   "repository": "jonschlinkert/expand-object",
-  "bugs": "https://github.com/jonschlinkert/expand-object/issues",
+  "bugs": {
+    "bugs": "https://github.com/jonschlinkert/expand-object/issues"
+  },
   "license": "MIT",
   "files": [
-    "index.js",
-    "cli.js"
+    "cli.js",
+    "index.js"
   ],
   "main": "index.js",
   "engines": {
@@ -23,11 +25,10 @@
     "expand-object": "cli.js"
   },
   "dependencies": {
-    "data-store": "^0.11.1",
-    "get-stdin": "^5.0.0",
-    "is-number": "^2.0.2",
+    "get-stdin": "^5.0.1",
+    "is-number": "^2.1.0",
     "minimist": "^1.2.0",
-    "set-value": "^0.3.0"
+    "set-value": "^0.3.2"
   },
   "devDependencies": {
     "mocha": "*"
@@ -52,6 +53,13 @@
   "verb": {
     "related": {
       "list": "expand-args"
-    }
+    },
+    "reflinks": [
+      "collapse-object"
+    ],
+    "layout": "default",
+    "plugins": [
+      "gulp-format-md"
+    ]
   }
 }
