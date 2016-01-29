@@ -1,7 +1,7 @@
 {
   "name": "expand-object",
   "description": "Expand a string into a JavaScript object using a simple notation. Use the CLI or as a node.js lib.",
-  "version": "0.4.1",
+  "version": "0.4.2",
   "homepage": "https://github.com/jonschlinkert/expand-object",
   "author": "Jon Schlinkert (https://github.com/jonschlinkert)",
   "repository": "jonschlinkert/expand-object",
@@ -20,7 +20,6 @@
   "scripts": {
     "test": "mocha"
   },
-  "preferGlobal": true,
   "bin": {
     "expand-object": "cli.js"
   },
@@ -28,9 +27,10 @@
     "get-stdin": "^5.0.1",
     "is-number": "^2.1.0",
     "minimist": "^1.2.0",
-    "set-value": "^0.3.2"
+    "set-value": "^0.3.3"
   },
   "devDependencies": {
+    "gulp-format-md": "^0.1.5",
     "mocha": "*"
   },
   "keywords": [
